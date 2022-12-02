@@ -1,0 +1,56 @@
+---
+title: "AdventOfCode20221201"
+output: html_document
+date: "2022-12-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+## Read in data
+
+```{r}
+
+input_raw <- read_lines("~/Downloads/input20221201.txt")
+
+elf_calories <- data.frame(input = input_raw) %>%
+  mutate(id = row_number(),
+         calories = as.numeric(input),
+         elf_id = if_else(input == "", id, NULL),
+         elf_id = if_else(id == last(id), id, elf_id)) %>%
+  fill(elf_id, .direction = "up")
+
+glimpse(elf_calories)
+
+```
+
+## Part 1
+
+```{r}
+
+part1 <- elf_calories %>%
+  count(elf_id, wt = calories, name = "total_calories") %>%
+  slice_max(order_by = total_calories) %>%
+  pull(total_calories)
+
+part1
+
+```
+
+## Part 2
+
+```{r}
+
+part2 <- elf_calories %>%
+  count(elf_id, wt = calories, name = "total_calories") %>%
+  arrange(desc(total_calories)) %>%
+  slice_head(n = 3) %>%
+  summarize(grand_total_calories = sum(total_calories)) %>%
+  pull(grand_total_calories)
+
+part2
+
+```
